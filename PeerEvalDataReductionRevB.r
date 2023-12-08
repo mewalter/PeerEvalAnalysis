@@ -18,7 +18,6 @@ setwd(DataDir)
 
 
 
-
 file_list <- list.files()
 # delete some files  
 file_list <- file_list[!grepl(paste0("desktop.ini", collapse = "|"), file_list)]
