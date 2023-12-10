@@ -4,7 +4,7 @@ library("openxlsx")    # library("readxl") # this is the tidyverse installed pac
 library("scales")
 library("lubridate")
 library("rstudioapi")
-library("rjson")
+library("jsonlite")
 
 
 ######### NOTE: probably only works when there is only ONE group category ##################
