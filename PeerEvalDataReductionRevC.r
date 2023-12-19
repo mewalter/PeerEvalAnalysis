@@ -86,7 +86,7 @@ Results <- FinalRankings %>% select(1:6) %>% group_by(V1) %>% summarise_all(list
 # Load team data to get team number and ucnetID into Results file ... FUTURE convert "Team X" to just "X"
 # teamdata = read.csv("../GroupsWithNames.csv", header = TRUE, stringsAsFactors = FALSE)
 Results <- Results %>% left_join(teamdata, by="Name")  %>%  # does NOT remove duplicates
-  rename(TeamNum=Project.Number, NumMem=Number.Members)
+  rename(TeamNum=ProjectName, NumMem=NumMembers)
 # Normalize average rating by team's max score
 Results <- Results %>%  group_by(TeamNum) %>% mutate(TeamMax=max(Avg)) %>% ungroup() %>% arrange(TeamNum) %>%
   mutate(AvgNorm = Avg/TeamMax*5) 
