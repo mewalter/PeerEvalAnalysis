@@ -10,8 +10,8 @@ library("jsonlite")
 ######### NOTE: probably only works when there is only ONE group category ##################
 
 # set the Canvas Class ID
-class_id <- "61600" # MAE151B_W24
-#class_id <- "60836" # MAE151A_W24
+#class_id <- "61600" # MAE151B_W24
+class_id <- "60836" # MAE151A_W24
 
 
 # set some strings for the fromJSON calls
@@ -41,18 +41,16 @@ for (i in 1:nrow(group_info)) {
                    UCInetID=userdata$login_id,Name=userdata$name)
 }
 
-
-
 BaseDir <- setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 #BaseDir <- setwd("~/pCloudDrive/RProjects/PeerEvalAnalysis")
 DataDir <- paste0(BaseDir,"/Data/")
 setwd(DataDir)
 #if( .Platform$OS.type == "unix" )
 #  DataDir <- "~/Dropbox/Classes/MAE151F20/Grades/PeerEval/MidQuarter/Data"
-#if( .Platform$OS.type == "unix" )
-#  BaseDir <- "~/Dropbox/Classes/MAE151F20/Grades/PeerEval/MidQuarter/Data"
 
 # rm(list=ls())
+
+write.csv(teamdata, file = "../GroupsWithNames.csv",row.names=FALSE)
 
 
 file_list <- list.files()
