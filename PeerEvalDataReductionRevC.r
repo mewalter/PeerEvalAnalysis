@@ -41,7 +41,7 @@ for (i in 1:nrow(group_info)) {
                    UCInetID=userdata$login_id,Name=userdata$name)
 }
 
-BaseDir <- setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+BaseDir <- dirname(rstudioapi::getActiveDocumentContext()$path)
 #BaseDir <- setwd("~/pCloudDrive/RProjects/PeerEvalAnalysis")
 DataDir <- paste0(BaseDir,"/Data/")
 setwd(DataDir)
@@ -91,7 +91,7 @@ Results <- Results %>% left_join(teamdata, by="Name")  %>%  # does NOT remove du
 Results <- Results %>%  group_by(TeamNum) %>% mutate(TeamMax=max(Avg)) %>% ungroup() %>% arrange(TeamNum) %>%
   mutate(AvgNorm = Avg/TeamMax*5) 
 
-# setwd(BaseDir)
+setwd(BaseDir)
 write.csv(FinalRankings, file = "../AllRankingsComments.csv",row.names=FALSE)
 write.csv(Results, file = "../Result4EachPerson.csv",row.names=FALSE)
 
