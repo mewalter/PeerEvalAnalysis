@@ -7,11 +7,10 @@ library("rstudioapi")
 library("jsonlite")
 
 
-######### NOTE: probably only works when there is only ONE group category ##################
+######### NOTE: if there is MORE than ONE group category, call4groups is a vector ... pick the right one! ##################
 
 # set the Canvas Class ID
-class_id <- "61600" # MAE151B_W24
-#class_id <- "60836" # MAE151A_W24
+class_id <- "63712" # MAE151B_Sp24
 
 
 # set some strings for the fromJSON calls
@@ -25,10 +24,9 @@ users_call <- paste0("/users?per_page=100&access_token=",token)
 call4cats <- paste0(canvas_base,"courses/",class_id,cats_call)
 categorydata <- fromJSON(call4cats)
 
-
 #now find all the ids and names of each group/team in each category    ############## ONLY ONE Category!!! ##########
 call4groups <- paste0(canvas_base,"group_categories/",categorydata$id,groups_call)
-groupdata <- fromJSON(call4groups)
+groupdata <- fromJSON(call4groups[2])
 group_info <- tibble(GroupID=groupdata$id,GroupName=groupdata$name,MemberCnt=groupdata$members_count) %>% 
   filter(MemberCnt>0)    # drop any groups that have zero members
 
@@ -41,12 +39,16 @@ for (i in 1:nrow(group_info)) {
                    UCInetID=userdata$login_id,Name=userdata$name)
 }
 
+# finished getting student info from canvas
+## now move on to getting and analyzing ranking data
+
 BaseDir <- dirname(rstudioapi::getActiveDocumentContext()$path)
 #BaseDir <- setwd("~/pCloudDrive/RProjects/PeerEvalAnalysis")
 DataDir <- paste0(BaseDir,"/Data/")
-setwd(DataDir)
 #if( .Platform$OS.type == "unix" )
 #  DataDir <- "~/Dropbox/Classes/MAE151F20/Grades/PeerEval/MidQuarter/Data"
+setwd(DataDir)
+
 
 # rm(list=ls())
 
@@ -57,10 +59,10 @@ file_list <- list.files()
 # delete some files  
 file_list <- file_list[!grepl(paste0("desktop.ini", collapse = "|"), file_list)]
 
-i <- 70       # for debugging
+i <- 34       # for debugging
 AllRankings = list()          # initialize list variable
 for (i in 1:length(file_list)) {
-  cat(file_list[i],sep='\n')
+    cat(file_list[i],sep='\n')
   FileData <- read.xlsx(file_list[i],colNames=FALSE)
   Comment.Row <- which(startsWith(FileData$X1,"Comments"))            # identify comment row
   NumMembers <- Comment.Row-7                                         # identify number of team members
@@ -71,6 +73,8 @@ for (i in 1:length(file_list)) {
   FileData.Rankings <- FileData.Rankings %>% mutate_at(vars(V2,V3,V4,V5,V6),as.numeric) %>%            
     mutate(across(where(is.factor),as.character)) %>% 
     select(1:6)                              # change to numeric and character and select first 6 columns
+  if (any(is.na(FileData.Rankings))){print(sprintf("%s is missing one or more rankings ******",file_list[i]))}
+  if (any(is.na(FileData.Comments$V1))){print(sprintf("%s is missing one or more comments ***",file_list[i]))}
   FileData.Rankings$Comments <- FileData.Comments$V1                  # insert the written comments
   FileData.Rankings$Rater <- gsub("_.*","",file_list[i])              # insert name of the person doing reviewing
   AllRankings[[i]] <- FileData.Rankings                               # add to master file
@@ -91,7 +95,7 @@ Results <- Results %>% left_join(teamdata, by="Name")  %>%  # does NOT remove du
 Results <- Results %>%  group_by(TeamNum) %>% mutate(TeamMax=max(Avg)) %>% ungroup() %>% arrange(TeamNum) %>%
   mutate(AvgNorm = Avg/TeamMax*5) 
 
-setwd(BaseDir)
+#setwd(BaseDir)
 write.csv(FinalRankings, file = "../AllRankingsComments.csv",row.names=FALSE)
 write.csv(Results, file = "../Result4EachPerson.csv",row.names=FALSE)
 
