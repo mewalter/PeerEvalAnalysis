@@ -43,7 +43,6 @@ library("jsonlite")
 
 # write.csv(teamdata, file = "../GroupsWithNames.csv",row.names=FALSE)
 
-teamdata <- read.csv("../GroupsWithNames.csv")
 
 # finished getting student info from canvas
 ## now move on to getting and analyzing ranking data
@@ -54,6 +53,8 @@ DataDir <- paste0(BaseDir,"/Data/")
 #if( .Platform$OS.type == "unix" )
 #  DataDir <- "~/Dropbox/Classes/MAE151F20/Grades/PeerEval/MidQuarter/Data"
 setwd(DataDir)
+
+teamdata <- read.csv("../GroupsWithNames.csv")
 
 
 # rm(list=ls())
@@ -81,6 +82,8 @@ for (i in 1:length(file_list)) {
   FileData.Rankings$Comments <- FileData.Comments$V1                  # insert the written comments
   FileData.Rankings$Rater <- gsub("_.*","",file_list[i])              # insert name of the person doing reviewing
   AllRankings[[i]] <- FileData.Rankings                               # add to master file
+  # cat(mean(as.matrix(FileData.Rankings[DataCols]),na.rm=T),sep='\n')   # look for all 5s
+  
 }   
 FinalRankings <- dplyr::bind_rows(AllRankings)       # turn list into data frame
 FinalRankings <- FinalRankings %>% arrange(desc(V1))   # just to dispay names together also has comments
